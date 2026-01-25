@@ -1,6 +1,6 @@
 import { World } from "./world.js";
 import { Player } from "./player.js";
-import * as vector from "./vector.js";
+import * as vector from "./utils/vector.js";
 
 
 const canvas = document.getElementById("canvas");
@@ -38,7 +38,7 @@ function loop(time) {
 
     ctx.clearRect(0, 0, screenWidth, screenHeight);
 
-    player.update(dt);
+    player.update(dt, world.map);
 
     world.render(ctx, screenWidth, screenHeight, player.position);
     player.render(ctx, screenWidth, screenHeight);

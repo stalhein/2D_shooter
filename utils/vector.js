@@ -12,9 +12,21 @@ export function normalize(a) {
     a.y *= factor;
 }
 
-export function multiplyScalar(a, b) {
-    a.x *= b;
-    a.y *= b;
+export function multiplyScalar(a, factor) {
+    a.x *= factor;
+    a.y *= factor;
+}
+
+export function length(a) {
+    return Math.sqrt(a.x * a.x + a.y * a.y);
+}
+
+export function clamp(a, length) {
+    const lengthA = this.length(a);
+    if (lengthA < length) return a;
+    const factor = length / lengthA;
+    a.x *= factor;
+    a.y *= factor;
 }
 
 export class Vec2 {

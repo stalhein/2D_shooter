@@ -1,5 +1,5 @@
 import { Constants } from "./constants.js";
-import * as vector from "./vector.js";
+import * as vector from "./utils/vector.js";
 
 export class World {
     constructor() {
