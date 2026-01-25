@@ -1,5 +1,6 @@
 import { World } from "./world.js";
 import { Player } from "./player.js";
+import * as vector from "./vector.js";
 
 
 const canvas = document.getElementById("canvas");
@@ -26,14 +27,20 @@ function resize() {
 resize();
 window.addEventListener("resize", resize);
 
+let lastTime = performance.now();
 
 const world = new World();
 const player = new Player();
 
 function loop(time) {
+    const dt = (time - lastTime) / 1000;
+    lastTime = time;
+
     ctx.clearRect(0, 0, screenWidth, screenHeight);
 
-    world.render(ctx, screenWidth, screenHeight, player.x, player.y);
+    player.update(dt);
+
+    world.render(ctx, screenWidth, screenHeight, player.position);
     player.render(ctx, screenWidth, screenHeight);
 
     requestAnimationFrame(loop);

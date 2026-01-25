@@ -1,7 +1,8 @@
 import { Constants } from "./constants.js";
+import * as vector from "./vector.js";
 
 export class World {
-    constructor () {
+    constructor() {
         this.map = [
             [1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
@@ -14,9 +15,9 @@ export class World {
         ];
     }
 
-    render (ctx, screenWidth, screenHeight, playerX, playerY) {
-        const topX = Math.floor(screenWidth/2 - playerX);
-        const topY = Math.floor(screenHeight/2 - playerY);
+    render(ctx, screenWidth, screenHeight, playerPosition) {
+        const topX = Math.floor(screenWidth/2 - playerPosition.x);
+        const topY = Math.floor(screenHeight/2 - playerPosition.y);
 
         const TILE_SIZE = Constants.TILE_SIZE;
 
