@@ -1,4 +1,4 @@
-import { Constants } from "./constants.js";
+import { Constants, Globals } from "./constants.js";
 import * as vector from "./utils/vector.js";
 import * as aabb from "./utils/aabb.js";
 
@@ -14,8 +14,18 @@ export class Player {
         this.friction = 10;
 
         this.keys = {};
+        this.mouseX = 0; 
+        this.mouseY = 0;
+        this.mouse = {};
         window.addEventListener("keydown", e => this.keys[e.key.toLowerCase()] = true);
         window.addEventListener("keyup", e => this.keys[e.key.toLowerCase()] = false);
+        window.addEventListener("mousedown", e => this.mouse[e.button] = true);
+        window.addEventListener("mouseup", e => this.mouse[e.button] = false);
+        window.addEventListener("mousemove", (e) => {
+            this.mouseX = e.clientX;
+            this.mouseY = e.clientY;
+        });
+
     }
 
     update(dt) {
@@ -83,15 +93,18 @@ export class Player {
         this.position.y += this.velocity.y;
 
         // Shoot
-        if (this.keys[" "]) this.shoot();
+        if (this.mouse[0]) this.shoot();
     }
 
-    render(ctx, screenWidth, screenHeight) {
+    render(ctx) {
         ctx.fillStyle = "blue";
-        ctx.fillRect(Math.floor(screenWidth/2), Math.floor(screenHeight/2), this.size, this.size);
+        ctx.fillRect(Math.floor(Globals.screenWidth/2), Math.floor(Globals.screenHeight/2), this.size, this.size);
     }
 
     shoot() {
-        this.world.bullets.push([this.position, vector.add(this.velocity, new vector.Vec2(1000, 0))]);
+        const direction = vector.normalize(new vector.Vec2(this.mouseX - Globals.screenWidth/2, this.mouseY - Globals.screenHeight/2));
+        const velocity = vector.multiplyScalar(vector.normalize(direction), 1000);
+        const position = new vector.Vec2(this.position.x, this.position.y);
+        this.world.bullets.push({position: position, velocity: velocity, bounces: 0,});
     }
 }
