@@ -10,11 +10,16 @@ export function normalize(a) {
 
     a.x *= factor;
     a.y *= factor;
+
+    return a;
 }
 
 export function multiplyScalar(a, factor) {
-    a.x *= factor;
-    a.y *= factor;
+    let result = new Vec2(a.x, a.y);
+    result.x *= factor;
+    result.y *= factor;
+
+    return result;
 }
 
 export function length(a) {

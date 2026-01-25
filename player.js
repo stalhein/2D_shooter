@@ -3,7 +3,9 @@ import * as vector from "./utils/vector.js";
 import * as aabb from "./utils/aabb.js";
 
 export class Player {
-    constructor() {
+    constructor(world) {
+        this.world = world;
+
         this.position = new vector.Vec2(200, 200);
         this.velocity = new vector.Vec2(0, 0);
 
@@ -16,7 +18,7 @@ export class Player {
         window.addEventListener("keyup", e => this.keys[e.key.toLowerCase()] = false);
     }
 
-    update(dt, tileMap) {
+    update(dt) {
         // Apply movement
         let acceleration = new vector.Vec2(0, 0);
         if (this.keys["a"]) acceleration.x -= 1;
@@ -25,13 +27,15 @@ export class Player {
         if (this.keys["s"]) acceleration.y += 1;
 
         vector.normalize(acceleration);
-        vector.multiplyScalar(acceleration, this.speed * dt * 60);
+        acceleration = vector.multiplyScalar(acceleration, this.speed * dt * 60);
         this.velocity = vector.add(this.velocity, acceleration);
-        vector.multiplyScalar(this.velocity, Math.max(0, 1 - (this.friction*dt)));
+        this.velocity = vector.multiplyScalar(this.velocity, Math.max(0, 1 - (this.friction*dt)));
         vector.clamp(this.velocity, this.speed);
 
         // Check collisions
         const TILE_SIZE = Constants.TILE_SIZE;
+
+        const tileMap = this.world.map;
 
         // X
         let playerAABB = new aabb.AABB(this.position.x+this.velocity.x, this.position.y, this.size, this.size);
@@ -77,10 +81,17 @@ export class Player {
         }
 
         this.position.y += this.velocity.y;
+
+        // Shoot
+        if (this.keys[" "]) this.shoot();
     }
 
     render(ctx, screenWidth, screenHeight) {
         ctx.fillStyle = "blue";
         ctx.fillRect(Math.floor(screenWidth/2), Math.floor(screenHeight/2), this.size, this.size);
+    }
+
+    shoot() {
+        this.world.bullets.push([this.position, vector.add(this.velocity, new vector.Vec2(1000, 0))]);
     }
 }

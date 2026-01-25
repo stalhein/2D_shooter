@@ -30,7 +30,7 @@ window.addEventListener("resize", resize);
 let lastTime = performance.now();
 
 const world = new World();
-const player = new Player();
+const player = new Player(world);
 
 function loop(time) {
     const dt = (time - lastTime) / 1000;
@@ -39,6 +39,7 @@ function loop(time) {
     ctx.clearRect(0, 0, screenWidth, screenHeight);
 
     player.update(dt, world.map);
+    world.update(dt);
 
     world.render(ctx, screenWidth, screenHeight, player.position);
     player.render(ctx, screenWidth, screenHeight);
