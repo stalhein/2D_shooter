@@ -27,34 +27,46 @@ export class World {
         for (let i = this.bullets.length-1; i >= 0; --i) {
             const bullet = this.bullets[i];
 
-            const velocity = vector.multiplyScalar(bullet.velocity, dt)
 
-            const newPosition = vector.add(bullet.position, velocity);
+            let timeLeft = dt;
+            let safe = 5;
 
-            const ray = this.raycastFromTo(bullet.position, newPosition);
+            while (timeLeft > 0 && safe > 0) {
+                safe--;
+                const move = vector.multiplyScalar(bullet.velocity, dt)
+                const length = vector.length(move);
+                const newPosition = vector.add(bullet.position, move);
 
-            if (!ray.hit) {
-                bullet.position = newPosition;
-                continue;
-            }
+                const ray = this.raycastFromTo(bullet.position, newPosition);
 
-            bullet.bounces++;
-            if (bullet.bounces >= 3) {
-                this.bullets.pop();
-                continue;
-            }
+                if (!ray.hit) {
+                    bullet.position = newPosition;
+                    break;
+                }
 
-            if (ray.side == 0) {
-                bullet.velocity.x -= 2 * bullet.velocity.x;
-            } else {
-                bullet.velocity.y -= 2 * bullet.velocity.y;
+                bullet.position = vector.add(bullet.position, vector.multiplyScalar(vector.normalize(move), ray.distance));
+
+                timeLeft *= 1-ray.distance / length;
+
+                bullet.bounces++;
+
+                if (bullet.bounces >= 3) {
+                    this.bullets.splice(i, 1);
+                    break;
+                }
+
+                if (ray.side == 0) {
+                    bullet.velocity.x = -bullet.velocity.x;
+                } else {
+                    bullet.velocity.y = -bullet.velocity.y;
+                }
             }
         }
     }
 
     render(ctx, playerPosition) {
-        const topX = Math.floor(Globals.screenWidth/2 - playerPosition.x);
-        const topY = Math.floor(Globals.screenHeight/2 - playerPosition.y);
+        const topX = Math.floor(Globals.screenWidth/2 - playerPosition.x - 24);
+        const topY = Math.floor(Globals.screenHeight/2 - playerPosition.y - 24);
 
         const TILE_SIZE = Constants.TILE_SIZE;
 

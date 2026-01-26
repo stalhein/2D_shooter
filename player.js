@@ -14,9 +14,10 @@ export class Player {
         this.friction = 10;
 
         this.keys = {};
-        this.mouseX = 0; 
+        this.mouseX = 0;
         this.mouseY = 0;
         this.mouse = {};
+        this.lastShot = 10;
         window.addEventListener("keydown", e => this.keys[e.key.toLowerCase()] = true);
         window.addEventListener("keyup", e => this.keys[e.key.toLowerCase()] = false);
         window.addEventListener("mousedown", e => this.mouse[e.button] = true);
@@ -93,18 +94,22 @@ export class Player {
         this.position.y += this.velocity.y;
 
         // Shoot
-        if (this.mouse[0]) this.shoot();
+        if (!this.mouse[0]) this.lastShot = 0;
+        if (this.mouse[0] && performance.now() - this.lastShot >= 150) {
+            this.shoot();
+            this.lastShot = performance.now();
+        }
     }
 
     render(ctx) {
         ctx.fillStyle = "blue";
-        ctx.fillRect(Math.floor(Globals.screenWidth/2), Math.floor(Globals.screenHeight/2), this.size, this.size);
+        ctx.fillRect(Math.floor(Globals.screenWidth/2 - this.size/2), Math.floor(Globals.screenHeight/2 - this.size/2), this.size, this.size);
     }
 
     shoot() {
         const direction = vector.normalize(new vector.Vec2(this.mouseX - Globals.screenWidth/2, this.mouseY - Globals.screenHeight/2));
         const velocity = vector.multiplyScalar(vector.normalize(direction), 1000);
-        const position = new vector.Vec2(this.position.x, this.position.y);
+        const position = new vector.Vec2(this.position.x+this.size/2, this.position.y+this.size/2);
         this.world.bullets.push({position: position, velocity: velocity, bounces: 0,});
     }
 }
