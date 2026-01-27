@@ -14,6 +14,7 @@ export class Bullets {
         for (let i = this.bullets.length-1; i >= 0; --i) {
             const bullet = this.bullets[i];
 
+            bullet.previous = bullet.position;
 
             let timeLeft = dt;
             let safe = 5;
@@ -25,7 +26,7 @@ export class Bullets {
                 }
 
                 safe--;
-                const move = vector.multiplyScalar(vector.normalize(bullet.velocity), dt * bullet.type.speed);
+                const move = vector.multiplyScalar(vector.normalize(bullet.velocity), timeLeft * bullet.type.speed);
                 const length = vector.length(move);
                 const newPosition = vector.add(bullet.position, move);
 
@@ -39,7 +40,7 @@ export class Bullets {
 
                 bullet.distance += ray.distance;
 
-                bullet.position = vector.add(bullet.position, vector.multiplyScalar(vector.normalize(move), ray.distance));
+                bullet.position = vector.add(bullet.position, vector.multiplyScalar(vector.normalize(move), ray.distance-0.0001));
 
                 timeLeft *= 1-ray.distance / length;
 
@@ -63,7 +64,19 @@ export class Bullets {
         const topX = Math.floor(Globals.screenWidth/2 - playerPosition.x - 24);
         const topY = Math.floor(Globals.screenHeight/2 - playerPosition.y - 24);
 
-        this.ctx.fillStyle = "red";
+        this.ctx.lineWidth = 6;
+        this.ctx.strokeStyle = "grad";
+        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.7";
+        
+        for (const bullet of this.bullets) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(topX+bullet.previous.x, topY+bullet.previous.y);
+            this.ctx.lineTo(topX+bullet.position.x, topY+bullet.position.y);
+            this.ctx.stroke();
+        }
+
+
+        this.ctx.fillStyle = "black";
         for (const bullet of this.bullets) {
             this.ctx.fillRect(topX + bullet.position.x-3, topY + bullet.position.y-3, 6, 6);
         }
@@ -157,6 +170,7 @@ export class Bullets {
     addBullet(position, velocity, type) {
         this.bullets.push({
             position: position,
+            previous: position,
             velocity: velocity,
             distance: 0,
             bounces: 0,

@@ -96,7 +96,7 @@ export class Player {
 
         // Shoot
         if (!this.mouse[0]) this.lastShot = 0;
-        if (this.mouse[0] && performance.now() - this.lastShot >= 150) {
+        if (this.mouse[0] && performance.now() - this.lastShot >= 200) {
             this.shoot();
             this.lastShot = performance.now();
         }
