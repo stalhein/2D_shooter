@@ -1,6 +1,7 @@
 import { Constants, Globals } from "./constants.js";
 import * as vector from "./utils/vector.js";
 import * as aabb from "./utils/aabb.js";
+import { BulletTypes } from "./data.js";
 
 export class Player {
     constructor(world) {
@@ -110,6 +111,6 @@ export class Player {
         const direction = vector.normalize(new vector.Vec2(this.mouseX - Globals.screenWidth/2, this.mouseY - Globals.screenHeight/2));
         const velocity = vector.multiplyScalar(vector.normalize(direction), 1000);
         const position = new vector.Vec2(this.position.x+this.size/2, this.position.y+this.size/2);
-        this.world.bullets.push({position: position, velocity: velocity, bounces: 0,});
+        this.world.bullets.addBullet(position, velocity, BulletTypes.Rifle);
     }
 }

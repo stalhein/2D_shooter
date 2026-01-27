@@ -1,8 +1,12 @@
 import { Constants, Globals } from "./constants.js";
 import * as vector from "./utils/vector.js";
+import { Bullets } from "./bullets.js";
+import { BulletTypes } from "./data.js";
 
 export class World {
-    constructor() {
+    constructor(ctx) {
+        this.ctx = ctx;
+
         this.map = [
             [1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
@@ -14,78 +18,31 @@ export class World {
             [1, 1, 1, 1, 1, 1, 1, 1],
         ];
 
-        this.bullets = [
-            {
-                position: new vector.Vec2(0, 0),
-                velocity: new vector.Vec2(1000, 0),
-                bounces: 0,
-            }
-        ];
+        this.bullets = new Bullets(this, ctx);
     }
 
     update(dt) {
-        for (let i = this.bullets.length-1; i >= 0; --i) {
-            const bullet = this.bullets[i];
-
-
-            let timeLeft = dt;
-            let safe = 5;
-
-            while (timeLeft > 0 && safe > 0) {
-                safe--;
-                const move = vector.multiplyScalar(bullet.velocity, dt)
-                const length = vector.length(move);
-                const newPosition = vector.add(bullet.position, move);
-
-                const ray = this.raycastFromTo(bullet.position, newPosition);
-
-                if (!ray.hit) {
-                    bullet.position = newPosition;
-                    break;
-                }
-
-                bullet.position = vector.add(bullet.position, vector.multiplyScalar(vector.normalize(move), ray.distance));
-
-                timeLeft *= 1-ray.distance / length;
-
-                bullet.bounces++;
-
-                if (bullet.bounces >= 3) {
-                    this.bullets.splice(i, 1);
-                    break;
-                }
-
-                if (ray.side == 0) {
-                    bullet.velocity.x = -bullet.velocity.x;
-                } else {
-                    bullet.velocity.y = -bullet.velocity.y;
-                }
-            }
-        }
+        this.bullets.update(dt);
     }
 
-    render(ctx, playerPosition) {
+    render(playerPosition) {
         const topX = Math.floor(Globals.screenWidth/2 - playerPosition.x - 24);
         const topY = Math.floor(Globals.screenHeight/2 - playerPosition.y - 24);
 
         const TILE_SIZE = Constants.TILE_SIZE;
 
         // Map
-        ctx.fillStyle = "green";
+        this.ctx.fillStyle = "green";
         for (let row = 0; row < Constants.MAP_HEIGHT; ++row) {
             for (let col = 0; col < Constants.MAP_WIDTH; ++col) {
                 if (this.map[row][col] == 0) continue;
                 const x = topX + col * TILE_SIZE;
                 const y = topY + row * TILE_SIZE;
-                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
 
-        // Bullets
-        ctx.fillStyle = "red";
-        for (const bullet of this.bullets) {
-            ctx.fillRect(topX + bullet.position.x, topY + bullet.position.y, 10, 10);
-        }
+        this.bullets.render(playerPosition);
     }
 
     raycast(origin, direction) {

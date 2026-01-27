@@ -27,7 +27,7 @@ window.addEventListener("resize", resize);
 
 let lastTime = performance.now();
 
-const world = new World();
+const world = new World(ctx);
 const player = new Player(world);
 
 function loop(time) {
@@ -39,7 +39,7 @@ function loop(time) {
     player.update(dt, world.map);
     world.update(dt);
 
-    world.render(ctx, player.position);
+    world.render(player.position);
     player.render(ctx);
 
     requestAnimationFrame(loop);
