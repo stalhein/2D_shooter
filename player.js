@@ -1,7 +1,7 @@
 import { Constants, Globals } from "./constants.js";
 import * as vector from "./utils/vector.js";
 import * as aabb from "./utils/aabb.js";
-import { BulletTypes } from "./data.js";
+import { BulletTypes, GunTypes } from "./data.js";
 
 export class Player {
     constructor(world) {
@@ -28,6 +28,9 @@ export class Player {
             this.mouseY = e.clientY;
         });
 
+        this.gun = GunTypes.AK47;
+        this.shotsFiredThisRound = 0;
+        this.startedReloading = 0;
     }
 
     update(dt) {
@@ -95,9 +98,19 @@ export class Player {
         this.position.y += this.velocity.y;
 
         // Shoot
-        if (!this.mouse[0]) this.lastShot = 0;
-        if (this.mouse[0] && performance.now() - this.lastShot >= 200) {
+        if (this.shotsFiredThisRound >= this.gun.rounds) {
+            this.shotsFiredThisRound = 0;
+            this.startedReloading = performance.now();
+            console.log("reloading");
+        }
+
+        if (performance.now() - this.startedReloading < this.gun.reloadTime) {
+            return;
+        }
+        
+        if (this.mouse[0] && performance.now() - this.lastShot >= this.gun.frequency) {
             this.shoot();
+            this.shotsFiredThisRound++;
             this.lastShot = performance.now();
         }
     }
@@ -109,8 +122,8 @@ export class Player {
 
     shoot() {
         const direction = vector.normalize(new vector.Vec2(this.mouseX - Globals.screenWidth/2, this.mouseY - Globals.screenHeight/2));
-        const velocity = vector.multiplyScalar(vector.normalize(direction), 1000);
+        const angle = Math.atan2(this.mouseY-Globals.screenHeight/2, this.mouseX-Globals.screenWidth/2);
         const position = new vector.Vec2(this.position.x+this.size/2, this.position.y+this.size/2);
-        this.world.bullets.addBullet(position, velocity, BulletTypes.Rifle);
+        this.world.bullets.addBullet(position, angle, this.gun.type, this.gun.spread);
     }
 }

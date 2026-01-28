@@ -26,7 +26,7 @@ export class Bullets {
                 }
 
                 safe--;
-                const move = vector.multiplyScalar(vector.normalize(bullet.velocity), timeLeft * bullet.type.speed);
+                const move = vector.multiplyScalar(vector.normalize(new vector.Vec2(Math.cos(bullet.angle), Math.sin(bullet.angle))), timeLeft * bullet.type.speed);
                 const length = vector.length(move);
                 const newPosition = vector.add(bullet.position, move);
 
@@ -52,9 +52,9 @@ export class Bullets {
                 }
 
                 if (ray.side == 0) {
-                    bullet.velocity.x = -bullet.velocity.x;
+                    bullet.angle = Math.PI - bullet.angle;
                 } else {
-                    bullet.velocity.y = -bullet.velocity.y;
+                    bullet.angle = -bullet.angle;
                 }
             }
         }
@@ -78,7 +78,7 @@ export class Bullets {
 
         this.ctx.fillStyle = "black";
         for (const bullet of this.bullets) {
-            this.ctx.fillRect(topX + bullet.position.x-3, topY + bullet.position.y-3, 6, 6);
+            this.ctx.fillRect(topX + bullet.position.x-bullet.type.size/2, topY + bullet.position.y-bullet.type.size/2, bullet.type.size, bullet.type.size);
         }
     }
 
@@ -167,11 +167,12 @@ export class Bullets {
         return this.world.map[ty][tx] != 0;
     }
 
-    addBullet(position, velocity, type) {
+    addBullet(position, angle, type, spread) {
+        const spreadAngle = (Math.random()-0.5)*2 * spread;
         this.bullets.push({
             position: position,
             previous: position,
-            velocity: velocity,
+            angle: angle + spreadAngle,
             distance: 0,
             bounces: 0,
             type: type,
