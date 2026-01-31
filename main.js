@@ -34,7 +34,7 @@ function loop(time) {
     const dt = (time - lastTime) / 1000;
     lastTime = time;
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.0)";
     ctx.clearRect(0, 0, Globals.screenWidth, Globals.screenHeight);
     ctx.fillRect(0, 0, Globals.screenWidth, Globals.screenHeight);
 

@@ -30,11 +30,16 @@ export class Player {
 
         this.gun = GunTypes.ak_47;
         this.shotsFiredThisRound = 0;
-        this.startedReloading = 0;
+        this.startedReloading = -10000;
         this.downBefore = false;
     }
 
     update(dt) {
+        if (this.keys["1"]) this.gun = GunTypes.glock_17, this.shotsFiredThisRound = 0;
+        else if (this.keys["2"]) this.gun = GunTypes.revolver, this.shotsFiredThisRound = 0;
+        else if (this.keys["3"]) this.gun = GunTypes.ak_47, this.shotsFiredThisRound = 0;
+
+
         // Apply movement
         let acceleration = new vector.Vec2(0, 0);
         if (this.keys["a"]) acceleration.x -= 1;
@@ -100,13 +105,17 @@ export class Player {
 
         // Shoot
         if (this.shotsFiredThisRound >= this.gun.rounds) {
-            this.shotsFiredThisRound = 0;
             this.startedReloading = performance.now();
-            console.log("reloading");
+            this.shotsFiredThisRound = 0;
         }
 
+        
+
         if (performance.now() - this.startedReloading < this.gun.reloadTime) {
+            this.world.gunStatus = `Reloading: ${(this.gun.reloadTime - (performance.now() - this.startedReloading))/1000}s left`;
             return;
+        } if (this.world.bulletsRemaining != this.gun.rounds - this.shotsFiredThisRound) this.world.gunStatus = `${this.gun.rounds - this.shotsFiredThisRound} bullets left`;
+        else {
         }
         
         if (this.mouse[0] && performance.now() - this.lastShot >= this.gun.frequency && (this.gun.auto || !this.downBefore)) {
@@ -118,6 +127,8 @@ export class Player {
         }
 
         if (this.downBefore && !this.mouse[0]) this.downBefore = false;
+
+        if (this.world.currentGunName != this.gun.name) this.world.currentGunName = this.gun.name;
     }
 
     render(ctx) {

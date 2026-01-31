@@ -17,6 +17,7 @@ export const BulletTypes = {
 
 export const GunTypes = {
     glock_17: {
+        name: "Glock 17",
         auto: false,
         frequency: 500,
         spread: 0.1,
@@ -27,6 +28,7 @@ export const GunTypes = {
         recoil: 3,
     },
     revolver: {
+        name: "Revolver",
         auto: false,
         frequency: 200,
         spread: 0.02,
@@ -37,6 +39,7 @@ export const GunTypes = {
         recoil: 6,
     },
     ak_47: {
+        name: "AK 47",
         auto: true,
         frequency: 100,
         spread: 0.01,

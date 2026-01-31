@@ -22,6 +22,10 @@ export class World {
         this.bullets = new Bullets(this, ctx);
 
         this.enemies = new Enemies(ctx);
+
+        
+        this.currentGunName = "";
+        this.gunStatus = "";
     }
 
     update(dt) {
@@ -48,6 +52,14 @@ export class World {
         this.enemies.render(playerPosition);
 
         this.bullets.render(playerPosition);
+
+
+
+        // Text
+        this.ctx.font = "30px Arial";
+        this.ctx.fillText(this.currentGunName, 100, 100);
+
+        this.ctx.fillText(this.gunStatus, 100, 150);
     }
 
     raycast(origin, direction) {
