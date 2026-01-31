@@ -4,7 +4,7 @@ import * as aabb from "./utils/aabb.js";
 import { BulletTypes, GunTypes } from "./data.js";
 
 export class Player {
-    constructor(world) {
+    constructor(world, canvas) {
         this.world = world;
 
         this.position = new vector.Vec2(200, 200);
@@ -24,8 +24,13 @@ export class Player {
         window.addEventListener("mousedown", e => this.mouse[e.button] = true);
         window.addEventListener("mouseup", e => this.mouse[e.button] = false);
         window.addEventListener("mousemove", (e) => {
-            this.mouseX = e.clientX;
-            this.mouseY = e.clientY;
+            const windowShape = canvas.getBoundingClientRect();
+
+            const sx = canvas.width / windowShape.width;
+            const sy = canvas.height / windowShape.height;
+
+            this.mouseX = (e.clientX-windowShape.left) * sx;
+            this.mouseY = (e.clientY-windowShape.top) * sy;
         });
 
         this.gun = GunTypes.ak_47;

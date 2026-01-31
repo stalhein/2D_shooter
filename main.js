@@ -28,7 +28,7 @@ window.addEventListener("resize", resize);
 let lastTime = performance.now();
 
 const world = new World(ctx);
-const player = new Player(world);
+const player = new Player(world, canvas);
 
 function loop(time) {
     const dt = (time - lastTime) / 1000;
