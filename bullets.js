@@ -66,7 +66,7 @@ export class Bullets {
 
         this.ctx.lineWidth = 6;
         this.ctx.strokeStyle = "grad";
-        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.7";
+        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
         
         for (const bullet of this.bullets) {
             this.ctx.beginPath();

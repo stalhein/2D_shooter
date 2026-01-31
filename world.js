@@ -2,6 +2,7 @@ import { Constants, Globals } from "./constants.js";
 import * as vector from "./utils/vector.js";
 import { Bullets } from "./bullets.js";
 import { BulletTypes } from "./data.js";
+import { Enemies } from "./enemies.js";
 
 export class World {
     constructor(ctx) {
@@ -19,6 +20,8 @@ export class World {
         ];
 
         this.bullets = new Bullets(this, ctx);
+
+        this.enemies = new Enemies(ctx);
     }
 
     update(dt) {
@@ -41,6 +44,8 @@ export class World {
                 this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
+
+        this.enemies.render(playerPosition);
 
         this.bullets.render(playerPosition);
     }

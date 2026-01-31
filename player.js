@@ -28,9 +28,10 @@ export class Player {
             this.mouseY = e.clientY;
         });
 
-        this.gun = GunTypes.AK47;
+        this.gun = GunTypes.ak_47;
         this.shotsFiredThisRound = 0;
         this.startedReloading = 0;
+        this.downBefore = false;
     }
 
     update(dt) {
@@ -108,22 +109,37 @@ export class Player {
             return;
         }
         
-        if (this.mouse[0] && performance.now() - this.lastShot >= this.gun.frequency) {
+        if (this.mouse[0] && performance.now() - this.lastShot >= this.gun.frequency && (this.gun.auto || !this.downBefore)) {
             this.shoot();
             this.shotsFiredThisRound++;
             this.lastShot = performance.now();
+
+            this.downBefore = true;
         }
+
+        if (this.downBefore && !this.mouse[0]) this.downBefore = false;
     }
 
     render(ctx) {
         ctx.fillStyle = "blue";
         ctx.fillRect(Math.floor(Globals.screenWidth/2 - this.size/2), Math.floor(Globals.screenHeight/2 - this.size/2), this.size, this.size);
+
+        // Gun
+        const angle = Math.atan2(this.mouseY-Globals.screenHeight/2, this.mouseX-Globals.screenWidth/2);
+        ctx.strokeStyle = "black";
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(Globals.screenWidth/2, Globals.screenHeight/2);
+        ctx.lineTo(Globals.screenWidth/2 + Math.cos(angle) * this.gun.length, Globals.screenHeight/2 + Math.sin(angle) * this.gun.length);
+        ctx.stroke();
     }
 
     shoot() {
-        const direction = vector.normalize(new vector.Vec2(this.mouseX - Globals.screenWidth/2, this.mouseY - Globals.screenHeight/2));
         const angle = Math.atan2(this.mouseY-Globals.screenHeight/2, this.mouseX-Globals.screenWidth/2);
-        const position = new vector.Vec2(this.position.x+this.size/2, this.position.y+this.size/2);
+        const position = new vector.Vec2(this.position.x+this.size/2 + Math.cos(angle) * this.size / 2, this.position.y+this.size/2 + Math.sin(angle) * this.size / 2);
         this.world.bullets.addBullet(position, angle, this.gun.type, this.gun.spread);
+
+        this.velocity.x += Math.cos(angle) * -this.gun.recoil;
+        this.velocity.y += Math.sin(angle) * -this.gun.recoil;
     }
 }
